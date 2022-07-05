@@ -1,3 +1,4 @@
+from itertools import count
 import json
 import csv
 
@@ -13,6 +14,8 @@ remainder = []
 def longestCommonPath(a, b):
     i = 0
     while a[i] == b[i]:
+        if i+1 == len(a) or i+1 == len(b):
+            break
         i+=1
     while a[i] != '/':
         i-=1

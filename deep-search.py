@@ -2,10 +2,10 @@ from googleapiclient.discovery import build
 import json
 
 companies = ["Avanti Feeds", 
-            "RACL Geartech",
-            "Rossell India",
-            "Acrysil",
-            "Pix Transmission"]
+             "Acrysil", 
+             "Bharat Rasayan", 
+             "Kovai Medical", 
+             "Meghmani Organics"]
 
 results = []
 
