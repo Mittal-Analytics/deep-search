@@ -27,9 +27,10 @@ for company in companies:
             .execute()
         )
 
-        if(res):
+        if "items" in res:
             for j in res["items"]:
                 results.append(j["link"])
+        else: break
 
 data = []
 
