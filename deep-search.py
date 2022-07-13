@@ -64,24 +64,24 @@ def longestCommonPath(a, b):
 ## Filter URL
 
 def filterURL(url):
-    flag1 = 1
-    flag2 = 1
+    is_domain = 1
+    is_path = 1
 
     for i in remainder:
         if i["domain"] == url["domain"]:
-            flag1 = 0
+            is_domain = 0
             if i["path"] in url["path"]:
-                flag2 = 0
+                is_path = 0
                 i["seen"] += 1
                 break
             else: ci = i
-    if flag1:
+    if is_domain:
         remainder.append({
             "domain": url["domain"],
             "path": url["path"],
             "seen": 1
         })
-    elif flag2:
+    elif is_path:
         remainder.append({
             "domain": url["domain"],
             "path": longestCommonPath(ci["path"], url["path"]),
