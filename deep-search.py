@@ -7,51 +7,48 @@ companies = ["Avanti Feeds",
              "Bharat Rasayan", 
              "Kovai Medical", 
              "Meghmani Organics"]
+remainder = []
+blacklist = []
 
-results = []
+def setup():
 
-service = build(
-    "customsearch", "v1", developerKey="AIzaSyDjL9Kcfl6O2Zvl_2alvqXSPsAnba0hEhw"
-)
+    results = []
+    data = []
 
-for company in companies:
-
-    for i in range(1, 100, 10):
-        res = (
-            service.cse()
-            .list(
-                q=company,
-                cx="cea393e795c307f0f",
-                start = i
-            )
-            .execute()
-        )
-
-        if "items" in res:
-            for j in res["items"]:
-                results.append(j["link"])
-        else: break
-
-data = []
-
-for i in results:
-    url = urlparse(i)
-    data.append(
-        {
-            "domain": url.netloc,
-            "path": url.path
-        }
+    service = build(
+        "customsearch", "v1", developerKey="AIzaSyDjL9Kcfl6O2Zvl_2alvqXSPsAnba0hEhw"
     )
 
-############
+    for company in companies:
 
-## The comparison happens now
+        for i in range(1, 100, 10):
+            res = (
+                service.cse()
+                .list(
+                    q=company,
+                    cx="cea393e795c307f0f",
+                    start = i
+                )
+                .execute()
+            )
 
-remainder = []
+            if "items" in res:
+                for j in res["items"]:
+                    results.append(j["link"])
+            else: break
 
-## Longest common path
+    for i in results:
+        url = urlparse(i)
+        data.append(
+            {
+                "domain": url.netloc,
+                "path": url.path
+            }
+        )
+    
+    return data
 
-def longestCommonPath(a, b):
+def longest_common_path(a, b):
     i = 0
     while a[i] == b[i]:
         if i+1 == len(a) or i+1 == len(b):
@@ -61,9 +58,7 @@ def longestCommonPath(a, b):
         i-=1
     return a[0:i+1]
 
-## Filter URL
-
-def filterURL(url):
+def filter_url(url):
     is_domain = 1
     is_path = 1
 
@@ -84,21 +79,18 @@ def filterURL(url):
     elif is_path:
         remainder.append({
             "domain": url["domain"],
-            "path": longestCommonPath(ci["path"], url["path"]),
+            "path": longest_common_path(ci["path"], url["path"]),
             "seen": ci["seen"] + 1
         })
-
-## Filtering Happens
-
+        
+## Execution starts here
+data = setup()
 for i in data:
-    filterURL(i)
+    filter_url(i)
 
 ## Writing to the file
-
-blacklist = []
-
 for i in remainder:
-    if i["seen"] > len(data)/200:
+    if i["seen"] > len(data)/(2*100):
         blacklist.append(i["domain"]+i["path"])
         
 with open("final.tsv", "w") as writeFile:
