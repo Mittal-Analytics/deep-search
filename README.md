@@ -10,7 +10,7 @@ from deep_search import find_blacklist_urls, generate_tsv, get_results
 
 # generate list of common urls
 search_terms = [
-	"Avanti Feeds", 
+    "Avanti Feeds", 
     "Acrysil", 
     "Bharat Rasayan", 
     "Kovai Medical", 
