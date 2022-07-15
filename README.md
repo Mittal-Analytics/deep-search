@@ -35,3 +35,5 @@ The blacklist_urls are found by finding common urls across given search terms.
 - the common url is NOT the root-url
 - the common url is a repeated pattern for different company names
 - concept of "holes" might be useful for this: https://github.com/paulsmith/templatemaker
+
+The script should try to hit as few urls as possible. Caching search results might be a good idea.
