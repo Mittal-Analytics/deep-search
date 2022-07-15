@@ -17,7 +17,7 @@ search_terms = [
     "Meghmani Organics"
 ]
 blacklist_urls = find_blacklist_urls(search_terms)
-generate_tsv(blacklist_urls)
+generate_tsv("custom-search.tsv", blacklist_urls)
 
 # upload the tsv file to Google Custom Search
 
@@ -28,5 +28,10 @@ results = get_results(custom_search_url)
 
 ## Algorithm
 
+The blacklist_urls are found by finding common urls across given search terms.
 
-Library sorts the common urls among different search queries and all their results, required apperance of a url to be excluded is atleast 50%.
+- save first 100 results for each search term
+- find common urls in at-least 80% of the search terms (4 companies if we give 5 names)
+- the common url is NOT the root-url
+- the common url is a repeated pattern for different company names
+- concept of "holes" might be useful for this: https://github.com/paulsmith/templatemaker
