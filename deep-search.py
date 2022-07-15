@@ -1,7 +1,13 @@
 import csv
+import json
+from distutils.command.config import config
+from pathlib import Path
 from urllib.parse import urlparse
 
+from dotenv import dotenv_values
 from googleapiclient.discovery import build
+
+CONFIG = dotenv_values(".env")
 
 
 def _get_longest_common_path(a, b):
@@ -55,27 +61,39 @@ def _find_blacklist_urls(data):
     return blacklist_urls
 
 
-def find_blacklist_urls(search_terms):
-    service = build(
-        "customsearch",
-        "v1",
-        developerKey="AIzaSyDjL9Kcfl6O2Zvl_2alvqXSPsAnba0hEhw",
-    )
+def _fetch_results(term, start):
+    CX = config["CX"]
+    V = config["V"]
+    DEV_KEY = config["DEV_KEY"]
 
+    key = f"cx:{CX}-v:{V}-page:{start}-term:{term}.json"
+    cache_f = Path("cache") / key
+    if cache_f.exists():
+        with open(cache_f, "r") as f:
+            content = f.read()
+        data = json.loads(content)
+    else:
+        service = build(
+            "customsearch",
+            "v1",
+            developerKey=DEV_KEY,
+        )
+        data = service.cse().list(q=term, cx=CX, start=start).execute()
+        with open(cache_f, "w") as f:
+            f.write(json.dumps(data))
+    return data
+
+
+def find_blacklist_urls(search_terms):
     results = []
     for term in search_terms:
         for i in range(1, 100, 10):
-            res = (
-                service.cse()
-                .list(q=term, cx="cea393e795c307f0f", start=i)
-                .execute()
-            )
-
-            if "items" in res:
-                for j in res["items"]:
-                    results.append(j["link"])
-            else:
-                break
+            res = _fetch_results(term, i)
+        if "items" in res:
+            for j in res["items"]:
+                results.append(j["link"])
+        else:
+            break
 
     data = []
     for i in results:
