@@ -11,12 +11,22 @@ class deep_search_tests(unittest.TestCase):
             "Meghmani Organics",
         ]
         blacklist = find_blacklist_urls(queries, "cea393e795c307f0f", "AIzaSyDjL9Kcfl6O2Zvl_2alvqXSPsAnba0hEhw")
-        self.assertTrue("www.moneycontrol.com/?" in blacklist)
+        found = False
+        for link in blacklist:
+            if "www.moneycontrol.com/" in link:
+                found = True
+                break
+        self.assertTrue(found)
 
     def test_get_results(self):
         query = "Avanti Feeds"
         results = get_results(query, "cea393e795c307f0f", "AIzaSyDjL9Kcfl6O2Zvl_2alvqXSPsAnba0hEhw")
-        self.assertTrue("www.indiankanoon.org/?" in results)
+        found = False
+        for link in results:
+            if "www.indiankanoon.org/" in link["link"]:
+                found = True
+                break
+        self.assertTrue(found)
 
 if __name__ == "__main__":
     unittest.main()
