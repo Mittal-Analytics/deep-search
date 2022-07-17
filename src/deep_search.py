@@ -10,13 +10,40 @@ def _init(key):
     )
     return cse
 
+def _longest_common_path(a, b):
+    i = 0
+    while a[i] == b[i]:
+        if i + 1 == len(a) or i + 1 == len(b):
+            break
+        i += 1
+    while a[i] != '/':
+        i -= 1
+    return a[0:i+1]
+
+
 def _update_list(links, link_list):
+    for link in links:
+        match_not_found = True
+        for entry in link_list:
+            if link["domain"] == entry["domain"]:
+                match_not_found = False
+                a = link["path"]
+                b = entry["path"]
+                if a in b or b in a:
+                    entry["path"] = _longest_common_path(a, b)
+                    entry["seen"] += 1
+        if match_not_found:
+            link_list.append({
+                "domain": link["domain"],
+                "path": link["path"],
+                "seen": 1
+            })
     #Pending...
     return link_list
 
 def _fetch_results(query, service, cx, for_blacklist):
     links = []
-    for i in range(1,100,10):
+    for i in range(1,50,10):
         res = service.cse().list(q=query, cx=cx, start=i).execute()["items"]
         if for_blacklist:
             for j in res:
@@ -36,6 +63,7 @@ def _fetch_results(query, service, cx, for_blacklist):
 
 def find_blacklist_urls(queries, cx, key):
     service = _init(key)
+    link_list = []
 
     for query in queries:
         link_list = _update_list(_fetch_results(query, service, cx, True), link_list) #True for find_blacklist_urls
@@ -43,7 +71,7 @@ def find_blacklist_urls(queries, cx, key):
     blacklist = []
 
     for entry in link_list:
-        if entry["seen"] > len(queries)/1.25: #80%
+        if entry["seen"] >= len(queries)/1.25: #80%
             blacklist.append(entry["domain"] + entry["path"])
 
     return blacklist
@@ -64,4 +92,4 @@ def get_results(query, cx, key):
     return _fetch_results(query, service, cx, False) #False for get_results
 
 
-find_blacklist_urls(["Avanti Feeds", "Reliance Industries"], "cea393e795c307f0f", "AIzaSyDjL9Kcfl6O2Zvl_2alvqXSPsAnba0hEhw")
+print(find_blacklist_urls(["Avanti Feeds", "Pix Transmission", "Kovai Medical", "Rossell India", "Acrysil"], "cea393e795c307f0f", "AIzaSyDjL9Kcfl6O2Zvl_2alvqXSPsAnba0hEhw"))
