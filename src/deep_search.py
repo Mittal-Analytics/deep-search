@@ -14,18 +14,18 @@ def _update_list(links, link_list):
     #Pending...
     return link_list
 
-def _fetch_results(query, service, cx, type):
+def _fetch_results(query, service, cx, for_blacklist):
     links = []
     for i in range(1,100,10):
         res = service.cse().list(q=query, cx=cx, start=i).execute()["items"]
-        if type == "fbu":
+        if for_blacklist:
             for j in res:
                 url = urlparse(j["link"])
                 links.append({
                     "domain": url.netloc,
                     "path": url.path
                 })
-        elif type == "gr":
+        else:
             for j in res:
                 links.append({
                     "title": j["title"],
@@ -38,7 +38,7 @@ def find_blacklist_urls(queries, cx, key):
     service = _init(key)
 
     for query in queries:
-        link_list = _update_list(_fetch_results(query, service, cx, "fbu"), link_list) #fbu for find_blacklist_urls
+        link_list = _update_list(_fetch_results(query, service, cx, True), link_list) #True for find_blacklist_urls
 
     blacklist = []
 
@@ -61,7 +61,7 @@ def generate_tsv(file_name, blacklist, whitelist):
 
 def get_results(query, cx, key):
     service = _init(key)
-    return _fetch_results(query, service, cx, "gr") #gr for get_results
+    return _fetch_results(query, service, cx, False) #False for get_results
 
 
 find_blacklist_urls(["Avanti Feeds", "Reliance Industries"], "cea393e795c307f0f", "AIzaSyDjL9Kcfl6O2Zvl_2alvqXSPsAnba0hEhw")
