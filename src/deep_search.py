@@ -21,27 +21,47 @@ def _longest_common_path(a, b):
     return a[0:i+1]
 
 def _link_sort(link):
-    return (link["domain"][4:], link["path"][1:])
+    return (link["domain"], link["path"])
 
 def _update_list(links, link_list):
-    for link in links:
-        match_not_found = True
-        for entry in link_list:
-            if link["domain"] == entry["domain"]:
-                match_not_found = False
-                a = link["path"]
-                b = entry["path"]
-                if a in b or b in a:
-                    entry["path"] = _longest_common_path(a, b)
-                    entry["seen"] += 1
-        if match_not_found:
+    i = 0
+    j = 0
+    while i < len(links):
+
+        if i+1 < len(links) and links[i]["domain"] == links[i+1]["domain"]:
+            links[i+1]["path"] = _longest_common_path(links[i]["path"], links[i+1]["path"])
+            i += 1
+            continue
+
+        if j == len(link_list):
             link_list.append({
-                "domain": link["domain"],
-                "path": link["path"],
+                "domain": links[i]["domain"],
+                "path": links[i]["path"],
                 "seen": 1
             })
-    link_list.sort(key=_link_sort)
-    #Pending...
+            i += 1
+            j += 1
+            continue
+
+        x = links[i]
+        y = link_list[j]
+
+        if x["domain"] == y["domain"]:
+            link_list[j]["path"] = _longest_common_path(x["path"], y["path"])
+            link_list[j]["seen"] += 1
+            i += 1
+            j += 1
+            continue
+
+        if x["domain"] < y["domain"]:
+            link_list.insert(j, {
+                "domain": x["domain"],
+                "path": x["path"],
+                "seen": 1
+            })
+            i += 1
+
+        j += 1
     return link_list
 
 def _fetch_results(query, service, cx, for_blacklist):
