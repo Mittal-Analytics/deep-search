@@ -10,7 +10,8 @@ class deep_search_tests(unittest.TestCase):
             "Kovai Medical",
             "Meghmani Organics",
         ]
-        blacklist = find_blacklist_urls(queries, "cea393e795c307f0f", "AIzaSyDjL9Kcfl6O2Zvl_2alvqXSPsAnba0hEhw")
+        blacklist = find_blacklist_urls(queries, "cx", "key")
+        #cx - custom search engine identity should be for the engine with no alterations
         found = False
         for link in blacklist:
             if "www.moneycontrol.com/" in link:
@@ -20,7 +21,8 @@ class deep_search_tests(unittest.TestCase):
 
     def test_get_results(self):
         query = "Avanti Feeds"
-        results = get_results(query, "cea393e795c307f0f", "AIzaSyDjL9Kcfl6O2Zvl_2alvqXSPsAnba0hEhw")
+        results = get_results(query, "cx", "key")
+        #cx - custom search engine identity should be for the engine after alterations
         found = False
         for link in results:
             if "www.indiankanoon.org/" in link["link"]:

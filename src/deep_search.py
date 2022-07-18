@@ -66,7 +66,7 @@ def _update_list(links, link_list):
 
 def _fetch_results(query, service, cx, for_blacklist):
     links = []
-    for i in range(1,50,10):
+    for i in range(1,100,10):
         res = service.cse().list(q=query, cx=cx, start=i).execute()["items"]
         if for_blacklist:
             for j in res:
@@ -114,6 +114,3 @@ def generate_tsv(file_name, blacklist, whitelist):
 def get_results(query, cx, key):
     service = _init(key)
     return _fetch_results(query, service, cx, False) #False for get_results
-
-
-print(find_blacklist_urls(["Avanti Feeds", "Pix Transmission", "Kovai Medical", "Rossell India", "Acrysil"], "cea393e795c307f0f", "AIzaSyCvd55nidD1iOCqXgeRJvAVNdu64GAqnQ8"))
