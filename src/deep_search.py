@@ -20,6 +20,8 @@ def _longest_common_path(a, b):
         i -= 1
     return a[0:i+1]
 
+def _link_sort(link):
+    return (link["domain"][4:], link["path"][1:])
 
 def _update_list(links, link_list):
     for link in links:
@@ -38,6 +40,7 @@ def _update_list(links, link_list):
                 "path": link["path"],
                 "seen": 1
             })
+    link_list.sort(key=_link_sort)
     #Pending...
     return link_list
 
@@ -52,6 +55,7 @@ def _fetch_results(query, service, cx, for_blacklist):
                     "domain": url.netloc,
                     "path": url.path
                 })
+            links.sort(key=_link_sort)
         else:
             for j in res:
                 links.append({
@@ -92,4 +96,4 @@ def get_results(query, cx, key):
     return _fetch_results(query, service, cx, False) #False for get_results
 
 
-print(find_blacklist_urls(["Avanti Feeds", "Pix Transmission", "Kovai Medical", "Rossell India", "Acrysil"], "cea393e795c307f0f", "AIzaSyDjL9Kcfl6O2Zvl_2alvqXSPsAnba0hEhw"))
+print(find_blacklist_urls(["Avanti Feeds", "Pix Transmission", "Kovai Medical", "Rossell India", "Acrysil"], "cea393e795c307f0f", "AIzaSyCvd55nidD1iOCqXgeRJvAVNdu64GAqnQ8"))
