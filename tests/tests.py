@@ -1,24 +1,34 @@
 import unittest
-from unittest import TestCase
+from src.deep_search import find_blacklist_urls, get_results
 
-from src.deep_search import find_blacklist_urls
-
-
-class SearchTestCase(TestCase):
-    def test_get_blacklist_urls(self):
-        search_terms = [
+class deep_search_tests(unittest.TestCase):
+    def test_find_blacklist_urls(self):
+        queries = [
             "Avanti Feeds",
             "Acrysil",
             "Bharat Rasayan",
             "Kovai Medical",
             "Meghmani Organics",
         ]
-        blacklist_urls = find_blacklist_urls(search_terms)
+        blacklist = find_blacklist_urls(queries, "cx", "key")
+        #cx - custom search engine identity should be for the engine with no alterations
+        found = False
+        for link in blacklist:
+            if "www.moneycontrol.com/" in link:
+                found = True
+                break
+        self.assertTrue(found)
 
-        self.assertTrue(
-            "https://www.moneycontrol.com/stocks/" in blacklist_urls
-        )
-
+    def test_get_results(self):
+        query = "Avanti Feeds"
+        results = get_results(query, "cx", "key")
+        #cx - custom search engine identity should be for the engine after alterations
+        found = False
+        for link in results:
+            if "www.indiankanoon.org/" in link["link"]:
+                found = True
+                break
+        self.assertTrue(found)
 
 if __name__ == "__main__":
     unittest.main()

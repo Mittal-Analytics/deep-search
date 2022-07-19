@@ -1,112 +1,116 @@
 import csv
-import json
-from distutils.command.config import config
-from pathlib import Path
+from googleapiclient.discovery import build
 from urllib.parse import urlparse
 
-from dotenv import dotenv_values
-from googleapiclient.discovery import build
+def _init(key):
+    cse = build(
+        "customsearch",
+        "v1",
+        developerKey = key
+    )
+    return cse
 
-CONFIG = dotenv_values(".env")
-
-
-def _get_longest_common_path(a, b):
+def _longest_common_path(a, b):
     i = 0
     while a[i] == b[i]:
         if i + 1 == len(a) or i + 1 == len(b):
             break
         i += 1
-    while a[i] != "/":
+    while a[i] != '/':
         i -= 1
-    return a[0 : i + 1]
+    return a[0:i+1]
 
+def _link_sort(link):
+    return (link["domain"], link["path"])
 
-def _filter_url(remainder, url):
-    flag1 = 1
-    flag2 = 1
+def _update_list(links, link_list):
+    i = 0
+    j = 0
+    while i < len(links):
 
-    for i in remainder:
-        if i["domain"] == url["domain"]:
-            flag1 = 0
-            if i["path"] in url["path"]:
-                flag2 = 0
-                i["seen"] += 1
-                break
-            else:
-                ci = i
-    if flag1:
-        remainder.append(
-            {"domain": url["domain"], "path": url["path"], "seen": 1}
-        )
-    elif flag2:
-        remainder.append(
-            {
-                "domain": url["domain"],
-                "path": _get_longest_common_path(ci["path"], url["path"]),
-                "seen": ci["seen"] + 1,
-            }
-        )
-    return remainder
+        if i+1 < len(links) and links[i]["domain"] == links[i+1]["domain"]:
+            links[i+1]["path"] = _longest_common_path(links[i]["path"], links[i+1]["path"])
+            i += 1
+            continue
 
+        if j == len(link_list):
+            link_list.append({
+                "domain": links[i]["domain"],
+                "path": links[i]["path"],
+                "seen": 1
+            })
+            i += 1
+            j += 1
+            continue
 
-def _find_blacklist_urls(data):
-    remainder = []
-    for i in data:
-        _filter_url(remainder, i)
+        x = links[i]
+        y = link_list[j]
 
-    blacklist_urls = []
-    for i in remainder:
-        if i["seen"] > len(data) / 200:
-            blacklist_urls.append(i["domain"] + i["path"])
-    return blacklist_urls
+        if x["domain"] == y["domain"]:
+            link_list[j]["path"] = _longest_common_path(x["path"], y["path"])
+            link_list[j]["seen"] += 1
+            i += 1
+            j += 1
+            continue
 
+        if x["domain"] < y["domain"]:
+            link_list.insert(j, {
+                "domain": x["domain"],
+                "path": x["path"],
+                "seen": 1
+            })
+            i += 1
 
-def _fetch_results(term, start):
-    CX = config["CX"]
-    V = config["V"]
-    DEV_KEY = config["DEV_KEY"]
+        j += 1
+    return link_list
 
-    key = f"cx:{CX}-v:{V}-page:{start}-term:{term}.json"
-    cache_f = Path("cache") / key
-    if cache_f.exists():
-        with open(cache_f, "r") as f:
-            content = f.read()
-        data = json.loads(content)
-    else:
-        service = build(
-            "customsearch",
-            "v1",
-            developerKey=DEV_KEY,
-        )
-        data = service.cse().list(q=term, cx=CX, start=start).execute()
-        with open(cache_f, "w") as f:
-            f.write(json.dumps(data))
-    return data
-
-
-def find_blacklist_urls(search_terms):
-    results = []
-    for term in search_terms:
-        for i in range(1, 100, 10):
-            res = _fetch_results(term, i)
-        if "items" in res:
-            for j in res["items"]:
-                results.append(j["link"])
+def _fetch_results(query, service, cx, for_blacklist):
+    links = []
+    for i in range(1,100,10):
+        res = service.cse().list(q=query, cx=cx, start=i).execute()["items"]
+        if for_blacklist:
+            for j in res:
+                url = urlparse(j["link"])
+                links.append({
+                    "domain": url.netloc,
+                    "path": url.path
+                })
+            links.sort(key=_link_sort)
         else:
-            break
+            for j in res:
+                links.append({
+                    "title": j["title"],
+                    "link": j["link"]
+                })
 
-    data = []
-    for i in results:
-        url = urlparse(i)
-        data.append({"domain": url.netloc, "path": url.path})
+    return links
 
-    blacklist_urls = _find_blacklist_urls(data)
-    return blacklist_urls
+def find_blacklist_urls(queries, cx, key):
+    service = _init(key)
+    link_list = []
 
+    for query in queries:
+        link_list = _update_list(_fetch_results(query, service, cx, True), link_list) #True for find_blacklist_urls
 
-def generate_tsv(filename, blacklist_urls):
-    with open(filename, "w") as writeFile:
-        tsv_writer = csv.writer(writeFile, delimiter="\t")
+    blacklist = []
+
+    for entry in link_list:
+        if entry["seen"] >= len(queries)/1.25: #80%
+            blacklist.append(entry["domain"] + entry["path"])
+
+    return blacklist
+
+def generate_tsv(file_name, blacklist, whitelist):
+    for white_link in whitelist:
+        for black_link in blacklist:
+            if white_link in black_link or black_link in white_link:
+                blacklist.remove(black_link)
+    with open(file_name, "w") as file:
+        tsv_writer = csv.writer(file, delimiter="\t")
         tsv_writer.writerow(["URL", "Label"])
-        for i in blacklist_urls:
-            tsv_writer.writerow([i + "*", "_exclude_"])
+        for link in blacklist:
+            tsv_writer.writerow([link + "*", "_exclude_"])
+
+def get_results(query, cx, key):
+    service = _init(key)
+    return _fetch_results(query, service, cx, False) #False for get_results

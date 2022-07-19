@@ -16,7 +16,9 @@ search_terms = [
     "Kovai Medical", 
     "Meghmani Organics"
 ]
-blacklist_urls = find_blacklist_urls(search_terms)
+cx = "custom_search_id"
+key = "api_key"
+blacklist_urls = find_blacklist_urls(search_terms, cx, key)
 # urls which should be ignored from blacklist
 whitelist_urls ['https://forbes.com']
 generate_tsv("custom-search.tsv", blacklist_urls, whitelist_urls)
@@ -24,8 +26,8 @@ generate_tsv("custom-search.tsv", blacklist_urls, whitelist_urls)
 # upload the tsv file to Google Custom Search
 
 # use custom search for better results
-custom_search_url = 'url'
-results = get_results(custom_search_url)
+search_term = "Avanti Feeds"
+results = get_results(search_term, cx, key)
 ```
 
 ## Algorithm
