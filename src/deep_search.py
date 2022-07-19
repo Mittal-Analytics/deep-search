@@ -103,7 +103,7 @@ def find_blacklist_urls(queries, cx, key):
 def generate_tsv(file_name, blacklist, whitelist):
     for white_link in whitelist:
         for black_link in blacklist:
-            if black_link in white_link:
+            if white_link in black_link or black_link in white_link:
                 blacklist.remove(black_link)
     with open(file_name, "w") as file:
         tsv_writer = csv.writer(file, delimiter="\t")
