@@ -1,7 +1,7 @@
 import unittest
 from src.deep_search import find_blacklist_urls, get_results
 
-class deep_search_tests(unittest.TestCase):
+class DeepSearchTests(unittest.TestCase):
     def test_find_blacklist_urls(self):
         queries = [
             "Avanti Feeds",
