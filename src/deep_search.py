@@ -11,14 +11,13 @@ def _init(key):
     return cse
 
 def _longest_common_path(a, b):
-    i = 0
+    i,j = 0
     while a[i] == b[i]:
         if i + 1 == len(a) or i + 1 == len(b):
             break
+        if a[i] == '/': j = i
         i += 1
-    while a[i] != '/':
-        i -= 1
-    return a[0:i+1]
+    return a[0:j+1]
 
 def _link_sort(link):
     return (link["domain"], link["path"])
