@@ -101,6 +101,7 @@ def find_blacklist_urls(queries, cx, key):
 
 def generate_tsv(file_name, blacklist, whitelist):
     for white_link in whitelist:
+        white_link = urlparse(white_link).netloc + urlparse(white_link).path
         for black_link in blacklist:
             if white_link in black_link or black_link in white_link:
                 blacklist.remove(black_link)
