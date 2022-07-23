@@ -2,16 +2,18 @@ import logging
 import os
 import unittest
 
-from src.deep_search import find_blacklist_urls
+from src.deep_search import find_blacklist_urls, get_results
 
 logging.basicConfig(level=logging.INFO)
 
 
 class DeepSearchTests(unittest.TestCase):
     def test_find_blacklist_urls(self):
-        # read CX and GOOGLE_CLOUD_KEY from environment variables
+
+        # Read CX and GOOGLE_CLOUD_KEY from environment variables
         CX = os.environ["CX"]
         GOOGLE_CLOUD_KEY = os.environ["GOOGLE_CLOUD_KEY"]
+        CACHE_VERSION = os.environ["CACHE_VERSION"]
 
         queries = [
             "Avanti Feeds",
@@ -20,7 +22,10 @@ class DeepSearchTests(unittest.TestCase):
             "Kovai Medical",
             "Meghmani Organics",
         ]
-        blacklist = find_blacklist_urls(queries, CX, GOOGLE_CLOUD_KEY)
+
+        blacklist = find_blacklist_urls(
+            queries, CX, GOOGLE_CLOUD_KEY, CACHE_VERSION
+        )
         self.assertTrue("www.screener.in/company/" in blacklist)
 
 

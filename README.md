@@ -27,6 +27,8 @@ from deep_search import find_blacklist_urls, generate_tsv, get_results
 # read CX and GOOGLE_CLOUD_KEY from environment variables
 CX = os.environ['CX']
 GOOGLE_CLOUD_KEY = os.environ['GOOGLE_CLOUD_KEY']
+CACHE_VERSION = os.environ['CACHE_VERSION']
+# specify CACHE_VERSION as None for no caching
 
 # generate list of common urls
 search_terms = [
@@ -40,11 +42,10 @@ blacklist_urls = find_blacklist_urls(
     search_terms,
     CX,
     GOOGLE_CLOUD_KEY,
-    # providing cache_key will cache the search results from Google
-    cache_key="v1",
+    CACHE_VERSION,
 )
 # urls which should be ignored from blacklist
-whitelist_urls ['https://forbes.com']
+whitelist_urls ['https://www.forbes.com']
 generate_tsv("custom-search.tsv", blacklist_urls, whitelist_urls)
 
 # upload the tsv file to Google Custom Search
