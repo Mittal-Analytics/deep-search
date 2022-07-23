@@ -5,8 +5,28 @@ Library for creating better search results for listed companies. Most of the res
 
 ## Usage
 
+Add `GOOGLE_CLOUD_KEY` and `CX` to your environment variables.
+
+```bash
+# generate custom search API credentials at:
+# https://console.cloud.google.com/apis/credentials
+export GOOGLE_CLOUD_KEY="key-generated-from-console"
+
+# create custom search url
+# https://programmablesearchengine.google.com/cse/all
+# paste "Search Engine ID" here
+export CX="search-engine-id"
+```
+
+Use the API to generate tsv.
+
 ```python
+import os
 from deep_search import find_blacklist_urls, generate_tsv, get_results
+
+# read CX and GOOGLE_CLOUD_KEY from environment variables
+CX = os.environ['CX']
+GOOGLE_CLOUD_KEY = os.environ['GOOGLE_CLOUD_KEY']
 
 # generate list of common urls
 search_terms = [
@@ -16,9 +36,7 @@ search_terms = [
     "Kovai Medical", 
     "Meghmani Organics"
 ]
-cx = "custom_search_id"
-key = "api_key"
-blacklist_urls = find_blacklist_urls(search_terms, cx, key)
+blacklist_urls = find_blacklist_urls(search_terms, CX, GOOGLE_CLOUD_KEY)
 # urls which should be ignored from blacklist
 whitelist_urls ['https://forbes.com']
 generate_tsv("custom-search.tsv", blacklist_urls, whitelist_urls)
@@ -41,3 +59,12 @@ The blacklist_urls are found by finding common urls across given search terms.
 - concept of "holes" might be useful for this: https://github.com/paulsmith/templatemaker
 
 The script should try to hit as few urls as possible. Caching search results might be a good idea.
+
+
+## Development
+
+Running tests:
+
+```
+python -m unittest
+```

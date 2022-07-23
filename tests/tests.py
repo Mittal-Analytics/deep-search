@@ -1,8 +1,15 @@
+import os
 import unittest
-from src.deep_search import find_blacklist_urls, get_results
+
+from src.deep_search import find_blacklist_urls
+
 
 class DeepSearchTests(unittest.TestCase):
     def test_find_blacklist_urls(self):
+        # read CX and GOOGLE_CLOUD_KEY from environment variables
+        CX = os.environ["CX"]
+        GOOGLE_CLOUD_KEY = os.environ["GOOGLE_CLOUD_KEY"]
+
         queries = [
             "Avanti Feeds",
             "Acrysil",
@@ -10,25 +17,9 @@ class DeepSearchTests(unittest.TestCase):
             "Kovai Medical",
             "Meghmani Organics",
         ]
-        blacklist = find_blacklist_urls(queries, "cx", "key")
-        #cx - custom search engine identity should be for the engine with no alterations
-        found = False
-        for link in blacklist:
-            if "www.moneycontrol.com/" in link:
-                found = True
-                break
-        self.assertTrue(found)
+        blacklist = find_blacklist_urls(queries, CX, GOOGLE_CLOUD_KEY)
+        self.assertTrue("www.screener.in/company/" in blacklist)
 
-    def test_get_results(self):
-        query = "Avanti Feeds"
-        results = get_results(query, "cx", "key")
-        #cx - custom search engine identity should be for the engine after alterations
-        found = False
-        for link in results:
-            if "www.indiankanoon.org/" in link["link"]:
-                found = True
-                break
-        self.assertTrue(found)
 
 if __name__ == "__main__":
     unittest.main()
