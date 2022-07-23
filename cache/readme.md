@@ -1,1 +1,4 @@
-This file is created for retaining cache folder only, since it is important for program to run.
+## Cache Folder
+
+This is cache folder, all your cache will come here.
+This folder is required for chaching.
