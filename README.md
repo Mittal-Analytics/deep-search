@@ -36,7 +36,13 @@ search_terms = [
     "Kovai Medical", 
     "Meghmani Organics"
 ]
-blacklist_urls = find_blacklist_urls(search_terms, CX, GOOGLE_CLOUD_KEY)
+blacklist_urls = find_blacklist_urls(
+    search_terms,
+    CX,
+    GOOGLE_CLOUD_KEY,
+    # providing cache_key will cache the search results from Google
+    cache_key="v1",
+)
 # urls which should be ignored from blacklist
 whitelist_urls ['https://forbes.com']
 generate_tsv("custom-search.tsv", blacklist_urls, whitelist_urls)

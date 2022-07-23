@@ -17,7 +17,9 @@ class DeepSearchTests(unittest.TestCase):
             "Kovai Medical",
             "Meghmani Organics",
         ]
-        blacklist = find_blacklist_urls(queries, CX, GOOGLE_CLOUD_KEY)
+        blacklist = find_blacklist_urls(
+            queries, CX, GOOGLE_CLOUD_KEY, cache_key="v1"
+        )
         self.assertTrue("www.screener.in/company/" in blacklist)
 
 

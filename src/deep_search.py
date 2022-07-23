@@ -1,5 +1,8 @@
 import csv
+import logging
 from urllib.parse import urlparse
+
+logger = logging.getLogger(__name__)
 
 from googleapiclient.discovery import build
 
@@ -65,12 +68,12 @@ def _update_list(links, link_list):
             i += 1
 
         j += 1
-    return link_list
 
 
 def _fetch_results(query, service, cx, for_blacklist):
     links = []
     for i in range(1, 100, 10):
+        logger.info(f"fetching results for {query} page {i}")
         res = service.cse().list(q=query, cx=cx, start=i).execute()["items"]
         if for_blacklist:
             for j in res:
@@ -88,17 +91,16 @@ def find_blacklist_urls(queries, cx, key):
     service = _init(key)
     link_list = []
 
+    logger.info("running queries")
     for query in queries:
-        link_list = _update_list(
+        _update_list(
             _fetch_results(query, service, cx, True), link_list
         )  # True for find_blacklist_urls
 
     blacklist = []
-
     for entry in link_list:
         if entry["seen"] >= len(queries) / 1.25:  # 80%
             blacklist.append(entry["domain"] + entry["path"])
-
     return blacklist
 
 
