@@ -2,7 +2,7 @@ import logging
 import os
 import unittest
 
-from src.deep_search import find_blacklist_urls, get_results
+from src.deep_search import find_blacklist_urls
 
 logging.basicConfig(level=logging.INFO)
 

@@ -29,46 +29,53 @@ def _link_sort(link):
     return (link["domain"], link["path"])
 
 
-def _update_list(links, link_list):
-    i = j = 0
-    while i < len(links):
+def _update_links_list(links, link_list):
+    links_index = link_list_index = 0
+    while links_index < len(links):
 
-        if i + 1 < len(links) and links[i]["domain"] == links[i + 1]["domain"]:
-            links[i + 1]["path"] = _longest_common_path(
-                links[i]["path"], links[i + 1]["path"]
+        if (
+            links_index + 1 < len(links)
+            and links[links_index]["domain"]
+            == links[links_index + 1]["domain"]
+        ):
+            links[links_index + 1]["path"] = _longest_common_path(
+                links[links_index]["path"], links[links_index + 1]["path"]
             )
-            i += 1
+            links_index += 1
             continue
 
-        if j == len(link_list):
+        if link_list_index == len(link_list):
             link_list.append(
                 {
-                    "domain": links[i]["domain"],
-                    "path": links[i]["path"],
+                    "domain": links[links_index]["domain"],
+                    "path": links[links_index]["path"],
                     "seen": 1,
                 }
             )
-            i += 1
-            j += 1
+            links_index += 1
+            link_list_index += 1
             continue
 
-        x = links[i]
-        y = link_list[j]
+        x = links[links_index]
+        y = link_list[link_list_index]
 
         if x["domain"] == y["domain"]:
-            link_list[j]["path"] = _longest_common_path(x["path"], y["path"])
-            link_list[j]["seen"] += 1
-            i += 1
-            j += 1
+            link_list[link_list_index]["path"] = _longest_common_path(
+                x["path"], y["path"]
+            )
+            link_list[link_list_index]["seen"] += 1
+            links_index += 1
+            link_list_index += 1
             continue
 
         if x["domain"] < y["domain"]:
             link_list.insert(
-                j, {"domain": x["domain"], "path": x["path"], "seen": 1}
+                link_list_index,
+                {"domain": x["domain"], "path": x["path"], "seen": 1},
             )
-            i += 1
+            links_index += 1
 
-        j += 1
+        link_list_index += 1
     return link_list
 
 
@@ -116,7 +123,7 @@ def find_blacklist_urls(queries, cx, key, cache_version):
 
     logger.info("Running queries...")
     for query in queries:
-        _update_list(
+        _update_links_list(
             _fetch_results(query, service, cx, True, cache_version), link_list
         )  # True for find_blacklist_urls
 
