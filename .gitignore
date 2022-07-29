@@ -130,3 +130,5 @@ dmypy.json
 
 # generated files
 custom-search.tsv
+.envrc
+cache/*.json
