@@ -76,7 +76,6 @@ def _update_links_list(links, link_list):
             links_index += 1
 
         link_list_index += 1
-    return link_list
 
 
 def _fetch_results(query, service, cx, for_blacklist, cache_version):
