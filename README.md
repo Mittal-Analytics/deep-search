@@ -29,11 +29,13 @@ You are now good to go, here is a demo implementation:
 import os
 from deep_search.deep_search import find_blacklist_urls, generate_tsv, get_results
 
-# We recommend using environment variables to keep these credentials secure, read GOOGLE_CLOUD_KEY, CX and CACHE_VERSION from the environment variables.
+# We recommend using environment variables to keep these credentials secure
+# read GOOGLE_CLOUD_KEY, CX and CACHE_VERSION from the environment variables.
 CX = os.environ['CX']
 GOOGLE_CLOUD_KEY = os.environ['GOOGLE_CLOUD_KEY']
 CACHE_VERSION = os.environ['CACHE_VERSION']
-# Specify CACHE_VERSION as None for no caching.
+# Specify CACHE_VERSION as None for no caching or use values like
+# "v1", "v2", "v3", "1", "2", "3" otherwise.
 
 # Define the terms you want to generate the list of common urls for
 search_terms = [
@@ -58,9 +60,11 @@ whitelist_urls ['https://www.forbes.com/']
 # Give a name to your tsv file and plug the variables, generates a tsv file.
 generate_tsv("custom-search.tsv", blacklist_urls, whitelist_urls)
 
-# This is where you upload the generated tsv to your Custom Search Engine at https://programmablesearchengine.google.com/cse/all (manually).
+# This is where you upload the generated tsv to your Custom Search Engine at
+# https://programmablesearchengine.google.com/cse/all (manually).
 
-# Use the given function to fetch refined results, returns a json list with title and link property.
+# Use the given function to fetch refined results,
+# returns a json list with title and link property.
 search_term = "Avanti Feeds"
 results = get_results(search_term, cx, key)
 ```
