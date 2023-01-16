@@ -35,8 +35,7 @@ def _update_links_list(links, link_list):
 
         if (
             links_index + 1 < len(links)
-            and links[links_index]["domain"]
-            == links[links_index + 1]["domain"]
+            and links[links_index]["domain"] == links[links_index + 1]["domain"]
         ):
             links[links_index + 1]["path"] = _longest_common_path(
                 links[links_index]["path"], links[links_index + 1]["path"]
@@ -92,17 +91,11 @@ def _fetch_results(query, service, cx, for_blacklist, cache_version):
                     content = f.read()
                 res = json.loads(content)
             else:
-                res = (
-                    service.cse()
-                    .list(q=query, cx=cx, start=i)
-                    .execute()["items"]
-                )
+                res = service.cse().list(q=query, cx=cx, start=i).execute()["items"]
                 with open(cache_f, "w") as f:
                     f.write(json.dumps(res))
         else:
-            res = (
-                service.cse().list(q=query, cx=cx, start=i).execute()["items"]
-            )
+            res = service.cse().list(q=query, cx=cx, start=i).execute()["items"]
 
         if for_blacklist:
             for j in res:
@@ -150,6 +143,4 @@ def generate_tsv(file_name, blacklist, whitelist):
 
 def get_results(query, cx, key):
     service = _init(key)
-    return _fetch_results(
-        query, service, cx, False, None
-    )  # False for get_results
+    return _fetch_results(query, service, cx, False, None)  # False for get_results

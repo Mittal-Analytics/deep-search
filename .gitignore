@@ -128,6 +128,9 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+# Misc
+.DS_Store
+
 # generated files
 custom-search.tsv
 .envrc
