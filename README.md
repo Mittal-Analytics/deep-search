@@ -16,14 +16,14 @@ Note: Please install the dependencies seprately for proper behaviour as they are
 
 You need to get two things now:
 
-1. GOOGLE_CLOUD_KEY
+1. GOOGLE_CLOUD_KEY/
    This is the Custom Search API credential and can be generated through this link:
    https://console.cloud.google.com/apis/credentials
-2. CX
+2. CX/
    This is the id of your Custom Search Engine and can be generated through this link:
    https://programmablesearchengine.google.com/cse/all
 
-You are now good to go, here is a basic implementation:
+You are now good to go, here is a demo implementation:
 
 ```python
 import os
