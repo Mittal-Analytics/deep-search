@@ -84,6 +84,8 @@ def _fetch_results(query, service, cx, for_blacklist, cache_version):
         logger.info(f"Fetching results for {query}, page {int(i/10 + 1)}...")
 
         if cache_version != None:
+            if not Path("cache").exists:
+                Path("cache").mkdir()
             key = f"cx:{cx}-v:{cache_version}-page:{int(i/10 + 1)}-term:{query}.json"
             cache_f = Path("cache") / key
             if cache_f.exists():

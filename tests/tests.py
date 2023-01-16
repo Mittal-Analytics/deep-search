@@ -2,7 +2,7 @@ import logging
 import os
 import unittest
 
-from src.deep_search import (
+from src.deep_search.deep_search import (
     _longest_common_path,
     _update_links_list,
     find_blacklist_urls,
