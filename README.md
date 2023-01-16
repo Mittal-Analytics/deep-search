@@ -1,40 +1,41 @@
 # deep-search
 
-Library for creating better search results for listed companies. Most of the results in Google search are currently for finance portals. This uses Google's custom search to exclude finance portals.
+This is a python library for generating a list of commons urls among different search results with the use of google's custom search api. The primary use would be to generate a tsv file through one of its function and upload it on google's programmable search engine to refine the search results.
+
+For example, it could be used to eliminate finance portals when we search for a listed company and only see the relevant information.
 
 ## Usage
 
-Add `GOOGLE_CLOUD_KEY`, `CX` and `CACHE_VERSION` to your environment variables.
+Install the library (only available for testing currently):
 
 ```bash
-# generate custom search API credentials at:
-# https://console.cloud.google.com/apis/credentials
-export GOOGLE_CLOUD_KEY="key-generated-from-console"
-
-# create custom search url
-# https://programmablesearchengine.google.com/cse/all
-# paste "Search Engine ID" here
-export CX="search-engine-id"
-
-# add cache version
-# values are None for no caching or any name user wants to give his cache
-# example values: None, "v1", "v2", "v3", 1, 2, 3, etc.
-export CACHE_VERSION="version or None"
+pip install -i https://test.pypi.org/simple/ --no-deps deep-search
 ```
 
-Use the API to generate tsv.
+Note: Please install the dependencies seprately for proper behaviour as they are not available in testing mode.
+
+You need to get two things now:
+
+1. GOOGLE_CLOUD_KEY
+   This is the Custom Search API credential and can be generated through this link:
+   https://console.cloud.google.com/apis/credentials
+2. CX
+   This is the id of your Custom Search Engine and can be generated through this link:
+   https://programmablesearchengine.google.com/cse/all
+
+You are now good to go, here is a basic implementation:
 
 ```python
 import os
-from deep_search import find_blacklist_urls, generate_tsv, get_results
+from deep_search.deep_search import find_blacklist_urls, generate_tsv, get_results
 
-# read CX and GOOGLE_CLOUD_KEY from environment variables
+# We recommend using environment variables to keep these credentials secure, read GOOGLE_CLOUD_KEY, CX and CACHE_VERSION from the environment variables.
 CX = os.environ['CX']
 GOOGLE_CLOUD_KEY = os.environ['GOOGLE_CLOUD_KEY']
 CACHE_VERSION = os.environ['CACHE_VERSION']
-# specify CACHE_VERSION as None for no caching
+# Specify CACHE_VERSION as None for no caching.
 
-# generate list of common urls
+# Define the terms you want to generate the list of common urls for
 search_terms = [
     "Avanti Feeds",
     "Acrysil",
@@ -42,39 +43,45 @@ search_terms = [
     "Kovai Medical",
     "Meghmani Organics"
 ]
+
+# Plug everything in this function, returns a list of common urls.
 blacklist_urls = find_blacklist_urls(
     search_terms,
     CX,
     GOOGLE_CLOUD_KEY,
     CACHE_VERSION,
 )
-# urls which should be ignored from blacklist
+
+# Specify the urls that you do not want to be included in the final tsv file.
 whitelist_urls ['https://www.forbes.com/']
+
+# Give a name to your tsv file and plug the variables, generates a tsv file.
 generate_tsv("custom-search.tsv", blacklist_urls, whitelist_urls)
 
-# upload the tsv file to Google Custom Search
+# This is where you upload the generated tsv to your Custom Search Engine at https://programmablesearchengine.google.com/cse/all (manually).
 
-# use custom search for better results
+# Use the given function to fetch refined results, returns a json list with title and link property.
 search_term = "Avanti Feeds"
 results = get_results(search_term, cx, key)
 ```
 
-## Algorithm
-
-The blacklist_urls are found by finding common urls across given search terms.
-
-- save first 100 results for each search term
-- find common urls in at-least 80% of the search terms (4 companies if we give 5 names)
-- the common url is NOT the root-url
-- the common url is a repeated pattern for different company names
-- concept of "holes" might be useful for this: https://github.com/paulsmith/templatemaker
-
-The script should try to hit as few urls as possible. Caching search results might be a good idea.
-
 ## Development
 
-Running tests:
+Setting up dev environment:
 
-```
+```bash
+# create and activate virtual env
+python3 -m venv .venv
+source .venv/bin/activate
+
+# install requirements
+pip install '.[dev]'
+
+# provide credentials
+cp .envrc.sample .envrc
+# edit and update the credentials in .env file
+vi .envrc
+
+# running tests
 python -m unittest
 ```
