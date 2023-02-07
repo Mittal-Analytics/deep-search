@@ -1,12 +1,9 @@
 import csv
 import json
-import logging
 from pathlib import Path
 from urllib.parse import urlparse
 
 from googleapiclient.discovery import build
-
-logger = logging.getLogger(__name__)
 
 
 def _init(key):
@@ -81,10 +78,10 @@ def _fetch_results(query, service, cx, for_blacklist, cache_version):
     links = []
     for i in range(1, 100, 10):
 
-        logger.info(f"Fetching results for {query}, page {int(i/10 + 1)}...")
+        print(f"Fetching results for {query}, page {int(i/10 + 1)}...")
 
         if cache_version != None:
-            if not Path("cache").exists:
+            if not Path("cache").exists():
                 Path("cache").mkdir()
             key = f"cx:{cx}-v:{cache_version}-page:{int(i/10 + 1)}-term:{query}.json"
             cache_f = Path("cache") / key
@@ -115,7 +112,7 @@ def find_blacklist_urls(queries, cx, key, cache_version):
     service = _init(key)
     link_list = []
 
-    logger.info("Running queries...")
+    print("Running queries...")
     for query in queries:
         _update_links_list(
             _fetch_results(query, service, cx, True, cache_version), link_list
