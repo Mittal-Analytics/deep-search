@@ -2,10 +2,11 @@ import logging
 import os
 import unittest
 
-from src.deep_search import (
+from src.deep_search.deep_search import (
     _longest_common_path,
     _update_links_list,
     find_blacklist_urls,
+    get_results,
 )
 
 logging.basicConfig(level=logging.INFO)
@@ -21,15 +22,13 @@ class DeepSearchTests(unittest.TestCase):
 
         queries = [
             "Avanti Feeds",
-            "Acrysil",
+            "Carysil",
             "Bharat Rasayan",
             "Kovai Medical",
             "Meghmani Organics",
         ]
 
-        blacklist = find_blacklist_urls(
-            queries, CX, GOOGLE_CLOUD_KEY, CACHE_VERSION
-        )
+        blacklist = find_blacklist_urls(queries, CX, GOOGLE_CLOUD_KEY, CACHE_VERSION)
         self.assertTrue("www.screener.in/company/" in blacklist)
 
     def test_longest_common_path(self):
@@ -51,6 +50,18 @@ class DeepSearchTests(unittest.TestCase):
             {"domain": "www.trendlyne.com", "path": "/", "seen": 2},
         ]
         self.assertEqual(expected, links_list)
+
+    def test_get_results(self):
+        CX = os.environ["CX"]
+        GOOGLE_CLOUD_KEY = os.environ["GOOGLE_CLOUD_KEY"]
+        results = get_results("Carysil", CX, GOOGLE_CLOUD_KEY)
+        self.assertTrue(
+            {
+                "title": "Carysil Ltd financial results and price chart - Screener",
+                "link": "https://www.screener.in/company/CARYSIL/consolidated/",
+            }
+            not in results
+        )
 
 
 if __name__ == "__main__":
